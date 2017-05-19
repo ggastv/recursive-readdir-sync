@@ -1,24 +1,10 @@
-var fs = require('fs')
+const fs = require('fs')
   , p = require('path')
   ;
 
-// how to know when you are done?
-function recursiveReaddirSync(path) {
-  var list = []
-    , files = fs.readdirSync(path)
-    , stats
-    ;
-
-  files.forEach(function (file) {
-    stats = fs.lstatSync(p.join(path, file));
-    if(stats.isDirectory()) {
-      list = list.concat(recursiveReaddirSync(p.join(path, file)));
-    } else {
-      list.push(p.join(path, file));
-    }
-  });
-
-  return list;
-}
+const recursiveReaddirSync = path =>
+    fs.readdirSync(path)
+        .map(file => p.join(path, file))
+	.reduce((oldValue, file) => (oldValue.concat(fs.lstatSync(file).isDirectory() ? recursiveReaddirSync(file) : file)), []);
 
 module.exports = recursiveReaddirSync;
